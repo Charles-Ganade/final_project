@@ -16,7 +16,7 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261124101332_AddCategoriesAndStoreCategories";
+    public override string LastMigrationId => "20261124103654_AddItems";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -268,6 +268,49 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                 b.ToTable("Customers");
             });
 
+        modelBuilder.Entity("final_project.Models.Item", b =>
+            {
+                var id = b.Property<long>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("bigint");
+
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(id);
+
+                b.Property<string>("Description")
+                    .HasColumnType("nvarchar(max)");
+
+                b.Property<string>("ImageUrl")
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
+
+                b.Property<bool>("IsAvailable")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("bit")
+                    .HasDefaultValue(true);
+
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(150)
+                    .HasColumnType("nvarchar(150)");
+
+                b.Property<decimal>("Price")
+                    .HasPrecision(8, 2)
+                    .HasColumnType("decimal(8,2)");
+
+                b.Property<string>("StoreId")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(450)");
+
+                b.HasKey("Id");
+
+                b.HasIndex("StoreId");
+
+                b.ToTable("Items", t =>
+                    {
+                        t.HasCheckConstraint("CK_Items_Price_NonNegative", "[Price] >= 0");
+                    });
+            });
+
         modelBuilder.Entity("final_project.Models.Store", b =>
             {
                 b.Property<string>("AccountId")
@@ -387,6 +430,17 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                 b.Navigation("Account");
             });
 
+        modelBuilder.Entity("final_project.Models.Item", b =>
+            {
+                b.HasOne("final_project.Models.Store", "Store")
+                    .WithMany("Items")
+                    .HasForeignKey("StoreId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.Navigation("Store");
+            });
+
         modelBuilder.Entity("final_project.Models.Store", b =>
             {
                 b.HasOne("final_project.Models.Account", "Account")
@@ -438,6 +492,8 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
 
         modelBuilder.Entity("final_project.Models.Store", b =>
             {
+                b.Navigation("Items");
+
                 b.Navigation("StoreCategories");
             });
 #pragma warning restore 612, 618
