@@ -16,7 +16,7 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261124074929_AddCustomerAndStoreProfiles";
+    public override string LastMigrationId => "20261124101332_AddCategoriesAndStoreCategories";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -232,6 +232,27 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                 b.ToTable("AspNetUsers");
             });
 
+        modelBuilder.Entity("final_project.Models.Category", b =>
+            {
+                var id = b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(id);
+
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
+
+                b.HasKey("Id");
+
+                b.HasIndex("Name")
+                    .IsUnique();
+
+                b.ToTable("Categories");
+            });
+
         modelBuilder.Entity("final_project.Models.Customer", b =>
             {
                 b.Property<string>("AccountId")
@@ -287,6 +308,21 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                 b.HasIndex("ReviewedByAccountId");
 
                 b.ToTable("Stores");
+            });
+
+        modelBuilder.Entity("final_project.Models.StoreCategory", b =>
+            {
+                b.Property<string>("StoreId")
+                    .HasColumnType("nvarchar(450)");
+
+                b.Property<int>("CategoryId")
+                    .HasColumnType("int");
+
+                b.HasKey("StoreId", "CategoryId");
+
+                b.HasIndex("CategoryId");
+
+                b.ToTable("StoreCategories");
             });
 
         modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -369,11 +405,40 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                 b.Navigation("ReviewedBy");
             });
 
+        modelBuilder.Entity("final_project.Models.StoreCategory", b =>
+            {
+                b.HasOne("final_project.Models.Category", "Category")
+                    .WithMany("StoreCategories")
+                    .HasForeignKey("CategoryId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.HasOne("final_project.Models.Store", "Store")
+                    .WithMany("StoreCategories")
+                    .HasForeignKey("StoreId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.Navigation("Category");
+
+                b.Navigation("Store");
+            });
+
         modelBuilder.Entity("final_project.Models.Account", b =>
             {
                 b.Navigation("Customer");
 
                 b.Navigation("Store");
+            });
+
+        modelBuilder.Entity("final_project.Models.Category", b =>
+            {
+                b.Navigation("StoreCategories");
+            });
+
+        modelBuilder.Entity("final_project.Models.Store", b =>
+            {
+                b.Navigation("StoreCategories");
             });
 #pragma warning restore 612, 618
     }

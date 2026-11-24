@@ -27,5 +27,8 @@ namespace final_project.Models
         public Account Account { get; set; } = null!;
 
         public Account? ReviewedBy { get; set; }
+
+        public ICollection<StoreCategory> StoreCategories { get; set; }
+            = new List<StoreCategory>();    
     }
 }
