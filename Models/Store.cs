@@ -29,6 +29,8 @@ namespace final_project.Models
         public Account? ReviewedBy { get; set; }
 
         public ICollection<StoreCategory> StoreCategories { get; set; }
-            = new List<StoreCategory>();    
+            = new List<StoreCategory>();
+
+        public ICollection<Item> Items { get; set; } = new List<Item>();
     }
 }

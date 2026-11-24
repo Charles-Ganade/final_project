@@ -20,6 +20,8 @@ namespace final_project.Data
 
         public DbSet<StoreCategory> StoreCategories => Set<StoreCategory>();
 
+        public DbSet<Item> Items => Set<Item>();
+
         protected override void OnModelCreating(
             ModelBuilder builder)
         {
@@ -108,6 +110,42 @@ namespace final_project.Data
                     .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasIndex(sc => sc.CategoryId);
+            });
+
+            builder.Entity<Item>(entity =>
+            {
+                entity.HasKey(i => i.Id);
+
+                entity.Property(i => i.Name)
+                    .HasMaxLength(150)
+                    .IsRequired();
+
+                entity.Property(i => i.Description)
+                    .HasColumnType("nvarchar(max)");
+
+                entity.Property(i => i.Price)
+                    .HasPrecision(8, 2)
+                    .IsRequired();
+
+                entity.Property(i => i.ImageUrl)
+                    .HasMaxLength(500);
+
+                entity.Property(i => i.IsAvailable)
+                    .HasDefaultValue(true);
+
+                entity.HasOne(i => i.Store)
+                    .WithMany(s => s.Items)
+                    .HasForeignKey(i => i.StoreId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.ToTable(table =>
+                    table.HasCheckConstraint(
+                        "CK_Items_Price_NonNegative",
+                        "[Price] >= 0"
+                    ));
+
+                entity.HasIndex(i => i.StoreId);
             });
         }
     }
