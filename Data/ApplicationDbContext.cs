@@ -16,6 +16,10 @@ namespace final_project.Data
 
         public DbSet<Store> Stores => Set<Store>();
 
+        public DbSet<Category> Categories => Set<Category>();
+
+        public DbSet<StoreCategory> StoreCategories => Set<StoreCategory>();
+
         protected override void OnModelCreating(
             ModelBuilder builder)
         {
@@ -75,6 +79,35 @@ namespace final_project.Data
                     .WithMany()
                     .HasForeignKey(s => s.ReviewedByAccountId)
                     .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            builder.Entity<Category>(entity =>
+            {
+                entity.HasKey(c => c.Id);
+
+                entity.Property(c => c.Name)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.HasIndex(c => c.Name)
+                    .IsUnique();
+            });
+
+            builder.Entity<StoreCategory>(entity =>
+            {
+                entity.HasKey(sc => new { sc.StoreId, sc.CategoryId });
+
+                entity.HasOne(sc => sc.Store)
+                    .WithMany(s => s.StoreCategories)
+                    .HasForeignKey(sc => sc.StoreId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(sc => sc.Category)
+                    .WithMany(c => c.StoreCategories)
+                    .HasForeignKey(sc => sc.CategoryId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(sc => sc.CategoryId);
             });
         }
     }
