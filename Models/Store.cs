@@ -32,5 +32,7 @@ namespace final_project.Models
             = new List<StoreCategory>();
 
         public ICollection<Item> Items { get; set; } = new List<Item>();
+
+        public ICollection<StoreHour> StoreHours { get; set; } = new List<StoreHour>();
     }
 }
