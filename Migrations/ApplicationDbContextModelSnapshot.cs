@@ -16,7 +16,7 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261125035841_AddStoreRatings";
+    public override string LastMigrationId => "20261125040353_AddStoreRatings";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -387,7 +387,7 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
 
                 b.HasKey("StoreId", "DayOfWeek");
 
-                b.ToTable("StoreHour", t =>
+                b.ToTable("StoreHours", t =>
                     {
                         t.HasCheckConstraint("CK_StoreHours_DayOfWeek", "[DayOfWeek] >= 0 AND [DayOfWeek] <= 6");
 

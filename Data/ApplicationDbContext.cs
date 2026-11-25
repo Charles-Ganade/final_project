@@ -23,6 +23,8 @@ namespace final_project.Data
         public DbSet<Item> Items => Set<Item>();
 
         public DbSet<StoreRating> StoreRatings => Set<StoreRating>();
+
+        public DbSet<StoreHour> StoreHours => Set<StoreHour>();
         protected override void OnModelCreating(
             ModelBuilder builder)
         {
