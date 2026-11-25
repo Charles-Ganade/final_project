@@ -8,7 +8,7 @@ namespace final_project.Data
     public class ApplicationDbContext : IdentityDbContext<Account>
     {
         public ApplicationDbContext(
-            DbContextOptions<ApplicationDbContext> options): base(options)
+            DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 
@@ -22,8 +22,7 @@ namespace final_project.Data
 
         public DbSet<Item> Items => Set<Item>();
 
-        public DbSet<StoreHour> StoreHours => Set<StoreHour>();
-
+        public DbSet<StoreRating> StoreRatings => Set<StoreRating>();
         protected override void OnModelCreating(
             ModelBuilder builder)
         {
@@ -150,51 +149,38 @@ namespace final_project.Data
                 entity.HasIndex(i => i.StoreId);
             });
 
-            builder.Entity<StoreHour>(entity =>
-            {
-                entity.HasKey(sh => new { sh.StoreId, sh.DayOfWeek });
+            builder.Entity<StoreRating>(entity =>
+{
+    entity.HasKey(r => r.Id);
 
-                entity.HasOne(sh => sh.Store)
-                    .WithMany(s => s.StoreHours)
-                    .HasForeignKey(sh => sh.StoreId)
-                    .IsRequired()
-                    .OnDelete(DeleteBehavior.Cascade);
+    entity.Property(r => r.Score)
+            .IsRequired();
 
-                entity.Property(sh => sh.DayOfWeek)
-                    .HasConversion<int>();
+    entity.Property(r => r.Comment)
+            .HasMaxLength(500);
 
-                entity.Property(sh => sh.OpenTime)
-                    .HasColumnType("time");
+    entity.Property(r => r.CreatedAt)
+        .HasDefaultValueSql("SYSUTCDATETIME()");
 
-                entity.Property(sh => sh.CloseTime)
-                    .HasColumnType("time");
+    entity.HasOne(r => r.Store)
+            .WithMany(s => s.Ratings)
+            .HasForeignKey(r => r.StoreId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-                entity.ToTable(table =>
-                {
-                    table.HasCheckConstraint(
-                        "CK_StoreHours_ValidHours",
-                        """
-                        (
-                            [IsClosed] = 1
-                            AND [OpenTime] IS NULL
-                            AND [CloseTime] IS NULL
-                        )
-                        OR
-                        (
-                            [IsClosed] = 0
-                            AND [OpenTime] IS NOT NULL
-                            AND [CloseTime] IS NOT NULL
-                            AND [CloseTime] > [OpenTime]
-                        )
-                        """
-                    );
+    entity.HasOne(r => r.Customer)
+            .WithMany(c => c.Ratings)
+            .HasForeignKey(r => r.CustomerId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-                    table.HasCheckConstraint(
-                        "CK_StoreHours_DayOfWeek",
-                        "[DayOfWeek] >= 0 AND [DayOfWeek] <= 6"
-                    );
-                });
-            });
+    entity.HasIndex(r => new { r.StoreId, r.CustomerId })
+            .IsUnique();
+
+    entity.ToTable(table =>
+            table.HasCheckConstraint(
+                "CK_StoreRatings_Score_Range",
+                "[Score] >= 1 AND [Score] <= 5"
+            ));
+});
         }
     }
 }

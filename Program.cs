@@ -3,6 +3,7 @@ using final_project.Data;
 using final_project.Models;
 using Microsoft.AspNetCore.Identity;
 using DotNetEnv;
+using final_project.Services;
 
 Env.Load(Path.Combine(
     Directory.GetCurrentDirectory(),
@@ -14,6 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<IRatingService, RatingService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
@@ -29,14 +32,13 @@ builder.Services
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    
+
     string[] roles = { "customer", "store" };
 
     foreach (string role in roles)
