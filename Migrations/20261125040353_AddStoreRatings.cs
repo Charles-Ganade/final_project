@@ -6,28 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace final_project.Migrations;
 
 /// <inheritdoc />
-public partial class _20261125035841_AddStoreRatings : Migration
+public partial class _20261125040353_AddStoreRatings : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropForeignKey(
-            name: "FK_StoreHours_Stores_StoreId",
-            table: "StoreHours");
-
-        migrationBuilder.DropPrimaryKey(
-            name: "PK_StoreHours",
-            table: "StoreHours");
-
-        migrationBuilder.RenameTable(
-            name: "StoreHours",
-            newName: "StoreHour");
-
-        migrationBuilder.AddPrimaryKey(
-            name: "PK_StoreHour",
-            table: "StoreHour",
-            columns: new[] { "StoreId", "DayOfWeek" });
-
         migrationBuilder.CreateTable(
             name: "StoreRatings",
             columns: table => new
@@ -68,45 +51,12 @@ public partial class _20261125035841_AddStoreRatings : Migration
             table: "StoreRatings",
             columns: new[] { "StoreId", "CustomerId" },
             unique: true);
-
-        migrationBuilder.AddForeignKey(
-            name: "FK_StoreHour_Stores_StoreId",
-            table: "StoreHour",
-            column: "StoreId",
-            principalTable: "Stores",
-            principalColumn: "AccountId",
-            onDelete: ReferentialAction.Cascade);
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropForeignKey(
-            name: "FK_StoreHour_Stores_StoreId",
-            table: "StoreHour");
-
         migrationBuilder.DropTable(
             name: "StoreRatings");
-
-        migrationBuilder.DropPrimaryKey(
-            name: "PK_StoreHour",
-            table: "StoreHour");
-
-        migrationBuilder.RenameTable(
-            name: "StoreHour",
-            newName: "StoreHours");
-
-        migrationBuilder.AddPrimaryKey(
-            name: "PK_StoreHours",
-            table: "StoreHours",
-            columns: new[] { "StoreId", "DayOfWeek" });
-
-        migrationBuilder.AddForeignKey(
-            name: "FK_StoreHours_Stores_StoreId",
-            table: "StoreHours",
-            column: "StoreId",
-            principalTable: "Stores",
-            principalColumn: "AccountId",
-            onDelete: ReferentialAction.Cascade);
     }
 }

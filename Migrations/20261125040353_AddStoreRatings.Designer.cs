@@ -12,8 +12,8 @@ using final_project.Data;
 namespace final_project.Migrations;
 
 [DbContext(typeof(ApplicationDbContext))]
-[Migration("20261125035841_AddStoreRatings")]
-partial class _20261125035841_AddStoreRatings
+[Migration("20261125040353_AddStoreRatings")]
+partial class _20261125040353_AddStoreRatings
 {
     /// <inheritdoc />
     protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -385,7 +385,7 @@ partial class _20261125035841_AddStoreRatings
 
                 b.HasKey("StoreId", "DayOfWeek");
 
-                b.ToTable("StoreHour", t =>
+                b.ToTable("StoreHours", t =>
                     {
                         t.HasCheckConstraint("CK_StoreHours_DayOfWeek", "[DayOfWeek] >= 0 AND [DayOfWeek] <= 6");
 
