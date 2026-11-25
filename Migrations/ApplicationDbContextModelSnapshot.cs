@@ -16,7 +16,7 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261125021352_AddStoreHours";
+    public override string LastMigrationId => "20261125034355_AddStoreRatings";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -368,30 +368,47 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                 b.ToTable("StoreCategories");
             });
 
-        modelBuilder.Entity("final_project.Models.StoreHour", b =>
+        modelBuilder.Entity("final_project.Models.StoreRating", b =>
             {
-                b.Property<string>("StoreId")
+                var id = b.Property<long>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("bigint");
+
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(id);
+
+                b.Property<string>("Comment")
+                    .HasMaxLength(1000)
+                    .HasColumnType("nvarchar(1000)");
+
+                b.Property<DateTime>("CreatedAt")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("datetime2")
+                    .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                b.Property<string>("CustomerId")
+                    .IsRequired()
                     .HasColumnType("nvarchar(450)");
 
-                b.Property<int>("DayOfWeek")
+                b.Property<int>("Score")
                     .HasColumnType("int");
 
-                b.Property<TimeOnly?>("CloseTime")
-                    .HasColumnType("time");
+                b.Property<string>("StoreId")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(450)");
 
-                b.Property<bool>("IsClosed")
-                    .HasColumnType("bit");
+                b.Property<DateTime?>("UpdatedAt")
+                    .HasColumnType("datetime2");
 
-                b.Property<TimeOnly?>("OpenTime")
-                    .HasColumnType("time");
+                b.HasKey("Id");
 
-                b.HasKey("StoreId", "DayOfWeek");
+                b.HasIndex("CustomerId");
 
-                b.ToTable("StoreHours", t =>
+                b.HasIndex("StoreId", "CustomerId")
+                    .IsUnique();
+
+                b.ToTable("StoreRatings", t =>
                     {
-                        t.HasCheckConstraint("CK_StoreHours_DayOfWeek", "[DayOfWeek] >= 0 AND [DayOfWeek] <= 6");
-
-                        t.HasCheckConstraint("CK_StoreHours_ValidHours", "(\n    [IsClosed] = 1\n    AND [OpenTime] IS NULL\n    AND [CloseTime] IS NULL\n)\nOR\n(\n    [IsClosed] = 0\n    AND [OpenTime] IS NOT NULL\n    AND [CloseTime] IS NOT NULL\n    AND [CloseTime] > [OpenTime]\n)");
+                        t.HasCheckConstraint("CK_StoreRatings_Score_Range", "[Score] >= 1 AND [Score] <= 5");
                     });
             });
 
@@ -505,13 +522,21 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                 b.Navigation("Store");
             });
 
-        modelBuilder.Entity("final_project.Models.StoreHour", b =>
+        modelBuilder.Entity("final_project.Models.StoreRating", b =>
             {
+                b.HasOne("final_project.Models.Customer", "Customer")
+                    .WithMany("Ratings")
+                    .HasForeignKey("CustomerId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
+
                 b.HasOne("final_project.Models.Store", "Store")
-                    .WithMany("StoreHours")
+                    .WithMany("Ratings")
                     .HasForeignKey("StoreId")
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired();
+
+                b.Navigation("Customer");
 
                 b.Navigation("Store");
             });
@@ -528,13 +553,18 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                 b.Navigation("StoreCategories");
             });
 
+        modelBuilder.Entity("final_project.Models.Customer", b =>
+            {
+                b.Navigation("Ratings");
+            });
+
         modelBuilder.Entity("final_project.Models.Store", b =>
             {
                 b.Navigation("Items");
 
-                b.Navigation("StoreCategories");
+                b.Navigation("Ratings");
 
-                b.Navigation("StoreHours");
+                b.Navigation("StoreCategories");
             });
 #pragma warning restore 612, 618
     }
