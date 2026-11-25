@@ -11,7 +11,7 @@ namespace final_project.ViewModels
         [Range(1, 5, ErrorMessage = "Please select a rating between 1 and 5 stars.")]
         public int Score { get; set; }
 
-        [MaxLength(500, ErrorMessage = "Review comments cannot exceed 500 characters.")]
+        [MaxLength(1000, ErrorMessage = "Review comments cannot exceed 1000 characters.")]
         public string? Comment { get; set; }
     }
 }

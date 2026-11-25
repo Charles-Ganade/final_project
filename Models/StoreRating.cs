@@ -13,7 +13,7 @@ namespace final_project.Models
         [Range(1, 5)]
         public int Score { get; set; }
 
-        [MaxLength(500)]
+        [MaxLength(1000)]
         public string? Comment { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -157,7 +157,7 @@ namespace final_project.Data
             .IsRequired();
 
     entity.Property(r => r.Comment)
-            .HasMaxLength(500);
+            .HasMaxLength(1000);
 
     entity.Property(r => r.CreatedAt)
         .HasDefaultValueSql("SYSUTCDATETIME()");
