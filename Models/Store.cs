@@ -34,5 +34,8 @@ namespace final_project.Models
         public ICollection<Item> Items { get; set; } = new List<Item>();
 
         public ICollection<StoreRating> Ratings { get; set; } = new List<StoreRating>();
+
+        public ICollection<StoreHour> StoreHours { get; set; } = new List<StoreHour>();
+
     }
 }

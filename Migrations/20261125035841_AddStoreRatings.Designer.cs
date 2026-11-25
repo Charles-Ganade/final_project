@@ -12,8 +12,8 @@ using final_project.Data;
 namespace final_project.Migrations;
 
 [DbContext(typeof(ApplicationDbContext))]
-[Migration("20261125034355_AddStoreRatings")]
-partial class _20261125034355_AddStoreRatings
+[Migration("20261125035841_AddStoreRatings")]
+partial class _20261125035841_AddStoreRatings
 {
     /// <inheritdoc />
     protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -366,6 +366,33 @@ partial class _20261125034355_AddStoreRatings
                 b.ToTable("StoreCategories");
             });
 
+        modelBuilder.Entity("final_project.Models.StoreHour", b =>
+            {
+                b.Property<string>("StoreId")
+                    .HasColumnType("nvarchar(450)");
+
+                b.Property<int>("DayOfWeek")
+                    .HasColumnType("int");
+
+                b.Property<TimeOnly?>("CloseTime")
+                    .HasColumnType("time");
+
+                b.Property<bool>("IsClosed")
+                    .HasColumnType("bit");
+
+                b.Property<TimeOnly?>("OpenTime")
+                    .HasColumnType("time");
+
+                b.HasKey("StoreId", "DayOfWeek");
+
+                b.ToTable("StoreHour", t =>
+                    {
+                        t.HasCheckConstraint("CK_StoreHours_DayOfWeek", "[DayOfWeek] >= 0 AND [DayOfWeek] <= 6");
+
+                        t.HasCheckConstraint("CK_StoreHours_ValidHours", "(\n    [IsClosed] = 1\n    AND [OpenTime] IS NULL\n    AND [CloseTime] IS NULL\n)\nOR\n(\n    [IsClosed] = 0\n    AND [OpenTime] IS NOT NULL\n    AND [CloseTime] IS NOT NULL\n    AND [CloseTime] > [OpenTime]\n)");
+                    });
+            });
+
         modelBuilder.Entity("final_project.Models.StoreRating", b =>
             {
                 var id = b.Property<long>("Id")
@@ -520,6 +547,17 @@ partial class _20261125034355_AddStoreRatings
                 b.Navigation("Store");
             });
 
+        modelBuilder.Entity("final_project.Models.StoreHour", b =>
+            {
+                b.HasOne("final_project.Models.Store", "Store")
+                    .WithMany("StoreHours")
+                    .HasForeignKey("StoreId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.Navigation("Store");
+            });
+
         modelBuilder.Entity("final_project.Models.StoreRating", b =>
             {
                 b.HasOne("final_project.Models.Customer", "Customer")
@@ -563,6 +601,8 @@ partial class _20261125034355_AddStoreRatings
                 b.Navigation("Ratings");
 
                 b.Navigation("StoreCategories");
+
+                b.Navigation("StoreHours");
             });
 #pragma warning restore 612, 618
     }

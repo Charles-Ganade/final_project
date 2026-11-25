@@ -16,7 +16,7 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261125034355_AddStoreRatings";
+    public override string LastMigrationId => "20261125035841_AddStoreRatings";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -368,6 +368,33 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                 b.ToTable("StoreCategories");
             });
 
+        modelBuilder.Entity("final_project.Models.StoreHour", b =>
+            {
+                b.Property<string>("StoreId")
+                    .HasColumnType("nvarchar(450)");
+
+                b.Property<int>("DayOfWeek")
+                    .HasColumnType("int");
+
+                b.Property<TimeOnly?>("CloseTime")
+                    .HasColumnType("time");
+
+                b.Property<bool>("IsClosed")
+                    .HasColumnType("bit");
+
+                b.Property<TimeOnly?>("OpenTime")
+                    .HasColumnType("time");
+
+                b.HasKey("StoreId", "DayOfWeek");
+
+                b.ToTable("StoreHour", t =>
+                    {
+                        t.HasCheckConstraint("CK_StoreHours_DayOfWeek", "[DayOfWeek] >= 0 AND [DayOfWeek] <= 6");
+
+                        t.HasCheckConstraint("CK_StoreHours_ValidHours", "(\n    [IsClosed] = 1\n    AND [OpenTime] IS NULL\n    AND [CloseTime] IS NULL\n)\nOR\n(\n    [IsClosed] = 0\n    AND [OpenTime] IS NOT NULL\n    AND [CloseTime] IS NOT NULL\n    AND [CloseTime] > [OpenTime]\n)");
+                    });
+            });
+
         modelBuilder.Entity("final_project.Models.StoreRating", b =>
             {
                 var id = b.Property<long>("Id")
@@ -522,6 +549,17 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                 b.Navigation("Store");
             });
 
+        modelBuilder.Entity("final_project.Models.StoreHour", b =>
+            {
+                b.HasOne("final_project.Models.Store", "Store")
+                    .WithMany("StoreHours")
+                    .HasForeignKey("StoreId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.Navigation("Store");
+            });
+
         modelBuilder.Entity("final_project.Models.StoreRating", b =>
             {
                 b.HasOne("final_project.Models.Customer", "Customer")
@@ -565,6 +603,8 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                 b.Navigation("Ratings");
 
                 b.Navigation("StoreCategories");
+
+                b.Navigation("StoreHours");
             });
 #pragma warning restore 612, 618
     }
