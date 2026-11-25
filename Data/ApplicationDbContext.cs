@@ -181,6 +181,26 @@ namespace final_project.Data
                 "[Score] >= 1 AND [Score] <= 5"
             ));
 });
+            builder.Entity<StoreHour>(entity =>
+{
+    entity.HasKey(sh => new { sh.StoreId, sh.DayOfWeek });
+
+    entity.HasOne(sh => sh.Store)
+        .WithMany(s => s.StoreHours)
+        .HasForeignKey(sh => sh.StoreId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.ToTable(table =>
+    {
+        table.HasCheckConstraint(
+            "CK_StoreHours_DayOfWeek",
+            "[DayOfWeek] >= 0 AND [DayOfWeek] <= 6");
+
+        table.HasCheckConstraint(
+            "CK_StoreHours_ValidHours",
+            "(\n    [IsClosed] = 1\n    AND [OpenTime] IS NULL\n    AND [CloseTime] IS NULL\n)\nOR\n(\n    [IsClosed] = 0\n    AND [OpenTime] IS NOT NULL\n    AND [CloseTime] IS NOT NULL\n    AND [CloseTime] > [OpenTime]\n)");
+    });
+});
         }
     }
 }

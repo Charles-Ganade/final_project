@@ -6,13 +6,27 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace final_project.Migrations;
 
 /// <inheritdoc />
-public partial class _20261125034355_AddStoreRatings : Migration
+public partial class _20261125035841_AddStoreRatings : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "StoreHours");
+        migrationBuilder.DropForeignKey(
+            name: "FK_StoreHours_Stores_StoreId",
+            table: "StoreHours");
+
+        migrationBuilder.DropPrimaryKey(
+            name: "PK_StoreHours",
+            table: "StoreHours");
+
+        migrationBuilder.RenameTable(
+            name: "StoreHours",
+            newName: "StoreHour");
+
+        migrationBuilder.AddPrimaryKey(
+            name: "PK_StoreHour",
+            table: "StoreHour",
+            columns: new[] { "StoreId", "DayOfWeek" });
 
         migrationBuilder.CreateTable(
             name: "StoreRatings",
@@ -54,35 +68,45 @@ public partial class _20261125034355_AddStoreRatings : Migration
             table: "StoreRatings",
             columns: new[] { "StoreId", "CustomerId" },
             unique: true);
+
+        migrationBuilder.AddForeignKey(
+            name: "FK_StoreHour_Stores_StoreId",
+            table: "StoreHour",
+            column: "StoreId",
+            principalTable: "Stores",
+            principalColumn: "AccountId",
+            onDelete: ReferentialAction.Cascade);
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
+        migrationBuilder.DropForeignKey(
+            name: "FK_StoreHour_Stores_StoreId",
+            table: "StoreHour");
+
         migrationBuilder.DropTable(
             name: "StoreRatings");
 
-        migrationBuilder.CreateTable(
-            name: "StoreHours",
-            columns: table => new
-            {
-                StoreId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                DayOfWeek = table.Column<int>(type: "int", nullable: false),
-                CloseTime = table.Column<TimeOnly>(type: "time", nullable: true),
-                IsClosed = table.Column<bool>(type: "bit", nullable: false),
-                OpenTime = table.Column<TimeOnly>(type: "time", nullable: true)
-            },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_StoreHours", x => new { x.StoreId, x.DayOfWeek });
-                table.CheckConstraint("CK_StoreHours_DayOfWeek", "[DayOfWeek] >= 0 AND [DayOfWeek] <= 6");
-                table.CheckConstraint("CK_StoreHours_ValidHours", "(\n    [IsClosed] = 1\n    AND [OpenTime] IS NULL\n    AND [CloseTime] IS NULL\n)\nOR\n(\n    [IsClosed] = 0\n    AND [OpenTime] IS NOT NULL\n    AND [CloseTime] IS NOT NULL\n    AND [CloseTime] > [OpenTime]\n)");
-                table.ForeignKey(
-                    name: "FK_StoreHours_Stores_StoreId",
-                    column: x => x.StoreId,
-                    principalTable: "Stores",
-                    principalColumn: "AccountId",
-                    onDelete: ReferentialAction.Cascade);
-            });
+        migrationBuilder.DropPrimaryKey(
+            name: "PK_StoreHour",
+            table: "StoreHour");
+
+        migrationBuilder.RenameTable(
+            name: "StoreHour",
+            newName: "StoreHours");
+
+        migrationBuilder.AddPrimaryKey(
+            name: "PK_StoreHours",
+            table: "StoreHours",
+            columns: new[] { "StoreId", "DayOfWeek" });
+
+        migrationBuilder.AddForeignKey(
+            name: "FK_StoreHours_Stores_StoreId",
+            table: "StoreHours",
+            column: "StoreId",
+            principalTable: "Stores",
+            principalColumn: "AccountId",
+            onDelete: ReferentialAction.Cascade);
     }
 }
